@@ -16,6 +16,15 @@ def merge_dicts(dict1: dict, dict2: dict) -> dict:
         dict1[key] = dict1.get(key, 0) + value
     return dict1
 
+def count_all_words(directory: str) -> dict[str, int]:
+    total_count = {}
+    for f_name in os.listdir(directory):
+        with open(f"{directory}/{f_name}") as f:
+            words = extract_words(f.readlines()[2])
+            count_dict = count_words(words)
+            total_count = merge_dicts(total_count, count_dict)
+    return total_count
+
 def get_most_frequent_words(directory: str) -> DataFrame:
     """
     Return the 2000 most frequent worlds that appear in the files contained in the
@@ -23,12 +32,7 @@ def get_most_frequent_words(directory: str) -> DataFrame:
 
     :param directory The directory to search files in
     """
-    total_count = {}
-    for f_name in os.listdir(directory):
-        with open(f"{directory}/{f_name}") as f:
-            words = extract_words(f.read().splitlines()[2])
-            count_dict = count_words(words)
-            total_count = merge_dicts(total_count, count_dict)
+    total_count = count_all_words(directory)
 
     #return list(dict(sorted(total_count.items(), key=lambda x: x[1], reverse=True)).keys())[:2000]
 
@@ -39,7 +43,10 @@ def get_most_frequent_words(directory: str) -> DataFrame:
     return count_df.head(2000)
 
 def main():
-    print(get_most_frequent_words("train-mails"))
+    #print(get_most_frequent_words("train-mails"))
+    total_count = count_all_words('train-mails')
+    count_list = list(total_count.keys())
+    print(count_list)
 
 if __name__ == '__main__':
     main()
