@@ -26,7 +26,7 @@ def count_all_words(directory: str) -> dict[str, int]:
             total_count = merge_dicts(total_count, count_dict)
     return total_count
 
-def get_most_frequent_words(directory: str, amount: int = 2000) -> DataFrame:
+def get_most_frequent_words(directory: str, amount: int = 1000) -> DataFrame:
     """
     Return the most frequent words that appear in the files contained in the
     given directory

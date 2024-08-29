@@ -2,9 +2,10 @@ import time
 
 from matplotlib import pyplot as plt
 from seaborn import heatmap
-from sklearn.metrics import precision_score, confusion_matrix, roc_curve
+from sklearn.metrics import confusion_matrix, roc_curve
 from sklearn.naive_bayes import MultinomialNB
 
+from metrics import print_metrics
 from preprocessing import create_test_data, create_train_data
 from vocabulary import get_most_frequent_words
 
@@ -24,9 +25,9 @@ def plot_roc_curve(ys_test: list, ys_pred: list):
     plt.figure()
 
     for y_test, y_pred, vocab_size in zip(ys_test, ys_pred, vocabulary_sizes):
-        fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+        fpr, tpr, _ = roc_curve(y_test, y_pred)
         #roc_auc = auc(fpr, tpr)
-        plt.plot(fpr, tpr, label=f'ROC curve size={vocab_size}')
+        plt.plot(fpr, tpr, label=f'ROC curve vocab. size={vocab_size}')
     plt.plot([0, 1], [0, 1], 'k--',)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -52,14 +53,10 @@ def test_sizes():
         bayes.fit(x_train, y_train)
         print(f'Elapsed time: {time.time() - ts}')
 
-        accuracy = bayes.score(x_test, y_test)
-        print(f"Accuracy: {accuracy}")
-
-        y_pred = bayes.predict(x_test)
-        print(f'Precision: {precision_score(y_test, y_pred)}')
+        print_metrics(bayes, x_test, y_test)
 
         ys_test.append(y_test)
-        ys_pred.append(y_pred)
+        ys_pred.append(bayes.predict(x_test))
 
     plot_roc_curve(ys_test, ys_pred)
 
