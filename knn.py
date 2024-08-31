@@ -11,11 +11,11 @@ def test_k_values():
     ys_test = []
     ys_pred = []
 
+    x_train, y_train = create_train_data(vocabulary)
+    x_test, y_test = create_test_data(vocabulary)
+
     for k in k_values:
         print(f'\n===== Test with k set to {k} =====')
-
-        x_train, y_train = create_train_data(vocabulary)
-        x_test, y_test = create_test_data(vocabulary)
 
         knn = train_knn(x_train, y_train, k)
 

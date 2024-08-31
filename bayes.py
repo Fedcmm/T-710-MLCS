@@ -48,9 +48,7 @@ def test_sizes():
         ys_test, ys_pred
     )
 
-def train_bayes(vocabulary) -> MultinomialNB:
-    x_train, y_train = create_train_data(vocabulary)
-
+def train_bayes(x_train, y_train) -> MultinomialNB:
     bayes = MultinomialNB()
     # noinspection PyTypeChecker
     return bayes.fit(x_train, y_train)

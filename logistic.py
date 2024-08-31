@@ -11,11 +11,11 @@ def compare_c_values():
     ys_test = []
     ys_pred = []
 
+    x_train, y_train = create_train_data(vocabulary)
+    x_test, y_test = create_test_data(vocabulary)
+
     for c in c_values:
         print(f'\n===== Test with regularization set to {c} =====')
-
-        x_train, y_train = create_train_data(vocabulary)
-        x_test, y_test = create_test_data(vocabulary)
 
         logistic = train_logistic(x_train, y_train, c)
 
