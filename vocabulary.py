@@ -33,6 +33,7 @@ def get_most_frequent_words(directory: str, amount: int = 1000) -> DataFrame:
 
     :param directory: The directory to search files in
     :param amount: The amount of words to return
+    :return: A DataFrame with the columns "word" and "count"
     """
     total_count = count_all_words(directory)
 

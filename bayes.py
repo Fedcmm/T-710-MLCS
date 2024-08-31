@@ -2,10 +2,10 @@ import time
 
 from matplotlib import pyplot as plt
 from seaborn import heatmap
-from sklearn.metrics import confusion_matrix, roc_curve
+from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
 
-from metrics import print_metrics
+from metrics import print_metrics, plot_roc_curves
 from preprocessing import create_test_data, create_train_data
 from vocabulary import get_most_frequent_words
 
@@ -21,44 +21,39 @@ def plot_confusion_matrix(y_test, y_pred):
     ax.yaxis.set_ticklabels(['False', 'True'])
     plt.show()
 
-def plot_roc_curve(ys_test: list, ys_pred: list):
-    plt.figure()
-
-    for y_test, y_pred, vocab_size in zip(ys_test, ys_pred, vocabulary_sizes):
-        fpr, tpr, _ = roc_curve(y_test, y_pred)
-        #roc_auc = auc(fpr, tpr)
-        plt.plot(fpr, tpr, label=f'ROC curve vocab. size={vocab_size}')
-    plt.plot([0, 1], [0, 1], 'k--',)
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('ROC Curves for different vocabulary sizes')
-    plt.legend()
-    plt.show()
-
 def test_sizes():
     ys_test = []
     ys_pred = []
     for size in vocabulary_sizes:
-        print(f'\n\n===== Test with vocabulary size {size} =====')
+        print(f'\n===== Test with vocabulary size {size} =====')
 
-        ts = time.time()
         vocabulary = get_most_frequent_words('train-mails', size)["word"]
 
         x_train, y_train = create_train_data(vocabulary)
         x_test, y_test = create_test_data(vocabulary)
 
         bayes = MultinomialNB()
+        ts = time.time()
         bayes.fit(x_train, y_train)
-        print(f'Elapsed time: {time.time() - ts}')
+        print(f'Training time: {time.time() - ts}')
 
         print_metrics(bayes, x_test, y_test)
 
         ys_test.append(y_test)
         ys_pred.append(bayes.predict(x_test))
 
-    plot_roc_curve(ys_test, ys_pred)
+    plot_roc_curves(
+        'ROC Curves for different vocabulary sizes',
+        vocabulary_sizes,
+        ys_test, ys_pred
+    )
+
+def train_bayes(vocabulary) -> MultinomialNB:
+    x_train, y_train = create_train_data(vocabulary)
+
+    bayes = MultinomialNB()
+    # noinspection PyTypeChecker
+    return bayes.fit(x_train, y_train)
 
 def main():
     test_sizes()
