@@ -5,8 +5,8 @@ from seaborn import heatmap
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
 
-from metrics import print_metrics, plot_roc_curves
-from preprocessing import create_test_data, create_train_data
+from utils.metrics import print_metrics, plot_roc_curves
+from utils.preprocessing import create_test_data, create_train_data
 from vocabulary import get_most_frequent_words
 
 vocabulary_sizes = [100, 500, 1000, 2000, 3000]
@@ -40,7 +40,7 @@ def test_sizes():
         print_metrics(bayes, x_test, y_test)
 
         ys_test.append(y_test)
-        ys_pred.append(bayes.predict(x_test))
+        ys_pred.append(bayes.predict_proba(x_test)[:, 1])
 
     plot_roc_curves(
         'ROC Curves for different vocabulary sizes',

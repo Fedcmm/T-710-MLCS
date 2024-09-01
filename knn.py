@@ -1,7 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 
-from preprocessing import create_test_data, create_train_data
-from metrics import print_metrics, plot_roc_curves
+from utils.preprocessing import create_test_data, create_train_data
+from utils.metrics import print_metrics, plot_roc_curves
 from vocabulary import get_most_frequent_words
 
 k_values = [4, 6, 8, 10, 15, 20]
@@ -22,7 +22,7 @@ def test_k_values():
         print_metrics(knn, x_test, y_test)
 
         ys_test.append(y_test)
-        ys_pred.append(knn.predict(x_test))
+        ys_pred.append(knn.predict_proba(x_test)[:, 1])
 
     plot_roc_curves(
         'ROC Curves for different k values',

@@ -12,11 +12,12 @@ def create_labels(directory) -> list:
 
 def create_data(directory, vocabulary) -> DataFrame:
     """
-    Creates data suitable to be used with a model by reading files from the given
-    directory. The words in the files are vectorized using a CountVectorizer and
-    :param directory:
-    :param vocabulary:
-    :return:
+    Creates data suitable to be used with a model by reading files from the given directory.
+    The words in the files are vectorized using a CountVectorizer initialised with the given vocabulary.
+
+    :param directory: The directory containing the files to be processed
+    :param vocabulary: The vocabulary to be used in the vectorization
+    :return: A DataFrame containing the word counts, indexed with the file names
     """
     vectorizer = CountVectorizer(input='filename', vocabulary=vocabulary)
 
@@ -30,9 +31,19 @@ def create_data(directory, vocabulary) -> DataFrame:
     )
 
 def create_train_data(vocabulary) -> (DataFrame, list):
+    """
+    Creates the training data by reading from the 'train-mails' directory of the dataset.
+
+    :return: A DataFrame with the data and a list with its labels
+    """
     return (create_data('train-mails', vocabulary),
             create_labels('train-mails'))
 
 def create_test_data(vocabulary) -> (DataFrame, list):
+    """
+    Creates the test data by reading from the 'test-mails' directory of the dataset.
+
+    :return: A DataFrame with the data and a list with its labels
+    """
     return (create_data('test-mails', vocabulary),
             create_labels('test-mails'))

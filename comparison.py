@@ -1,8 +1,8 @@
 from bayes import train_bayes
 from knn import train_knn
 from logistic import train_logistic
-from metrics import print_metrics, plot_roc_curves
-from preprocessing import create_test_data, create_train_data
+from utils.metrics import print_metrics, plot_roc_curves
+from utils.preprocessing import create_test_data, create_train_data
 from vocabulary import get_most_frequent_words
 
 
