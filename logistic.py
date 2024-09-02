@@ -4,7 +4,7 @@ from utils.metrics import print_metrics, plot_roc_curves
 from utils.preprocessing import create_train_data, create_test_data
 from vocabulary import get_most_frequent_words
 
-c_values = [0.001, 0.4, 1, 4, 9]
+c_values = [0.001, 0.4, 1, 4, 20]
 
 def compare_c_values():
     vocabulary = get_most_frequent_words('train-mails')["word"]
@@ -33,7 +33,7 @@ def compare_c_values():
         ys_test, ys_pred
     )
 
-def train_logistic(x_train, y_train, c: float = 4) -> LogisticRegression:
+def train_logistic(x_train, y_train, c = 4.0) -> LogisticRegression:
     logistic = LogisticRegression(C=c)
     return logistic.fit(x_train, y_train)
 

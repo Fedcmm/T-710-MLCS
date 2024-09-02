@@ -14,13 +14,17 @@ def print_metrics(model, x, y):
     :param x: The test data
     :param y: The test labels
     """
-    accuracy = model.score(x, y)
     y_pred = model.predict(x)
 
+    accuracy = model.score(x, y)
+    precision = precision_score(y, y_pred)
+    recall = recall_score(y, y_pred)
+    f1 = f1_score(y, y_pred)
+
     print(f'Accuracy: {accuracy:.4f}',
-          f'Precision: {precision_score(y, y_pred):.4f}',
-          f'Recall: {recall_score(y, y_pred):.4f}',
-          f'F1 score: {f1_score(y, y_pred):.4f}',
+          f'Precision: {precision:.4f}',
+          f'Recall: {recall:.4f}',
+          f'F1 score: {f1:.4f}',
           sep='\t')
 
 def plot_roc_curves(title: str, plt_labels: list, ys_test: list, ys_pred: list):

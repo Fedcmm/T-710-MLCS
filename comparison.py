@@ -11,17 +11,23 @@ def main():
     x_train, y_train = create_train_data(vocabulary)
     x_test, y_test = create_test_data(vocabulary)
 
-    models = [train_bayes(x_train, y_train),
-              train_knn(x_train, y_train),
-              train_logistic(x_train, y_train)]
+    models = {'Naive Bayes': train_bayes(x_train, y_train),
+              'KNN': train_knn(x_train, y_train),
+              'Logistic Regression': train_logistic(x_train, y_train)}
 
     ys_test = []
     ys_pred = []
 
-    for model in models:
+    print('===== Hyper-parameter values =====')
+    print('Vocabulary size: 1000')
+    print('KNN k value: 15')
+    print('Logistic Regression C value: 4', end='\n\n')
+
+    for name, model in models.items():
+        print(f'\n===== Results for {name} =====')
         print_metrics(model, x_test, y_test)
         ys_test.append(y_test)
-        ys_pred.append(model.predict(x_test))
+        ys_pred.append(model.predict_proba(x_test)[:, 1])
 
     plot_roc_curves(
         'ROC curves for the different models',
