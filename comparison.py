@@ -3,7 +3,7 @@ from knn import train_knn
 from logistic import train_logistic
 from utils.metrics import print_metrics, plot_roc_curves
 from utils.preprocessing import create_test_data, create_train_data
-from vocabulary import get_most_frequent_words
+from utils.vocabulary import get_most_frequent_words
 
 
 def main():
@@ -19,9 +19,9 @@ def main():
     ys_pred = []
 
     print('===== Hyper-parameter values =====')
-    print('Vocabulary size: 1000')
-    print('KNN k value: 15')
-    print('Logistic Regression C value: 4', end='\n\n')
+    print('Vocabulary size: 3000')
+    print('KNN k value: 10')
+    print('Logistic Regression C value: 0.001', end='\n\n')
 
     for name, model in models.items():
         print(f'\n===== Results for {name} =====')
@@ -32,7 +32,8 @@ def main():
     plot_roc_curves(
         'ROC curves for the different models',
         ['Bayes', 'KNN', 'Logistic'],
-        ys_test, ys_pred
+        ys_test, ys_pred,
+        'comparison.png'
     )
 
 if __name__ == '__main__':

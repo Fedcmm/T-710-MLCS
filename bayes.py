@@ -7,7 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 
 from utils.metrics import print_metrics, plot_roc_curves
 from utils.preprocessing import create_test_data, create_train_data
-from vocabulary import get_most_frequent_words
+from utils.vocabulary import get_most_frequent_words
 
 vocabulary_sizes = [100, 500, 1000, 2000, 3000]
 
@@ -45,7 +45,8 @@ def test_sizes():
     plot_roc_curves(
         'ROC Curves for different vocabulary sizes',
         vocabulary_sizes,
-        ys_test, ys_pred
+        ys_test, ys_pred,
+        'bayes.png'
     )
 
 def train_bayes(x_train, y_train) -> MultinomialNB:
@@ -53,8 +54,5 @@ def train_bayes(x_train, y_train) -> MultinomialNB:
     # noinspection PyTypeChecker
     return bayes.fit(x_train, y_train)
 
-def main():
-    test_sizes()
-
 if __name__ == '__main__':
-    main()
+    test_sizes()

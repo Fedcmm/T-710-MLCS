@@ -27,7 +27,7 @@ def print_metrics(model, x, y):
           f'F1 score: {f1:.4f}',
           sep='\t')
 
-def plot_roc_curves(title: str, plt_labels: list, ys_test: list, ys_pred: list):
+def plot_roc_curves(title: str, plt_labels: list, ys_test: list, ys_pred: list, f_name: str):
     """
     Plots the ROC Curves for multiple models based on the given test and predicted values.
     The curves are plotted in a single graph.
@@ -36,6 +36,7 @@ def plot_roc_curves(title: str, plt_labels: list, ys_test: list, ys_pred: list):
     :param plt_labels: The labels of the curves
     :param ys_test: The expected values
     :param ys_pred: The predicted values
+    :param f_name: The name of the file to save the plot
     """
     plt.figure()
 
@@ -51,4 +52,5 @@ def plot_roc_curves(title: str, plt_labels: list, ys_test: list, ys_pred: list):
     plt.ylabel('True Positive Rate')
     plt.title(title)
     plt.legend()
+    plt.savefig(f'plots/{f_name}')
     plt.show()

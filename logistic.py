@@ -2,9 +2,9 @@ from sklearn.linear_model import LogisticRegression
 
 from utils.metrics import print_metrics, plot_roc_curves
 from utils.preprocessing import create_train_data, create_test_data
-from vocabulary import get_most_frequent_words
+from utils.vocabulary import get_most_frequent_words
 
-c_values = [0.001, 0.4, 1, 4, 20]
+c_values = [0.001, 0.4, 4, 40, 100]
 
 def compare_c_values():
     vocabulary = get_most_frequent_words('train-mails')["word"]
@@ -19,9 +19,9 @@ def compare_c_values():
 
         logistic = train_logistic(x_train, y_train, c)
 
-        print('Results for test set:', end='\t')
+        print('Test set:', end='\t')
         print_metrics(logistic, x_test, y_test)
-        print('Results for train set:', end='\t')
+        print('Train set:', end='\t')
         print_metrics(logistic, x_train, y_train)
 
         ys_test.append(y_test)
@@ -30,10 +30,11 @@ def compare_c_values():
     plot_roc_curves(
         'ROC Curves for different C values',
         c_values,
-        ys_test, ys_pred
+        ys_test, ys_pred,
+        'logistic.png'
     )
 
-def train_logistic(x_train, y_train, c = 4.0) -> LogisticRegression:
+def train_logistic(x_train, y_train, c = 0.001) -> LogisticRegression:
     logistic = LogisticRegression(C=c)
     return logistic.fit(x_train, y_train)
 

@@ -1,3 +1,7 @@
+"""
+This module contains the functions used to build the vocabulary for the vectorization of the dataset files.
+"""
+
 import os
 from pandas import DataFrame
 
@@ -26,10 +30,9 @@ def count_all_words(directory: str) -> dict[str, int]:
             total_count = merge_dicts(total_count, count_dict)
     return total_count
 
-def get_most_frequent_words(directory: str, amount: int = 1000) -> DataFrame:
+def get_most_frequent_words(directory: str, amount: int = 3000) -> DataFrame:
     """
-    Return the most frequent words that appear in the files contained in the
-    given directory
+    Return the most frequent words that appear in the files contained in the given directory.
 
     :param directory: The directory to search files in
     :param amount: The amount of words to return
@@ -42,8 +45,5 @@ def get_most_frequent_words(directory: str, amount: int = 1000) -> DataFrame:
     count_df.reset_index(drop=True, inplace=True)
     return count_df.head(amount)
 
-def main():
-    print(get_most_frequent_words("train-mails"))
-
 if __name__ == '__main__':
-    main()
+    print(get_most_frequent_words("train-mails"))
