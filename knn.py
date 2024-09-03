@@ -6,7 +6,7 @@ from utils.vocabulary import get_most_frequent_words
 
 k_values = [4, 6, 8, 10, 15, 20]
 
-def test_k_values():
+def compare_k_values():
     vocabulary = get_most_frequent_words('train-mails')["word"]
     ys_test = []
     ys_pred = []
@@ -36,4 +36,4 @@ def train_knn(x_train, y_train, k = 10) -> KNeighborsClassifier:
     return knn.fit(x_train, y_train)
 
 if __name__ == '__main__':
-    test_k_values()
+    compare_k_values()

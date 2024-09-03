@@ -18,7 +18,7 @@ def main():
     ys_test = []
     ys_pred = []
 
-    print('===== Hyper-parameter values =====')
+    print('\n===== Hyper-parameter values =====')
     print('Vocabulary size: 3000')
     print('KNN k value: 10')
     print('Logistic Regression C value: 0.001', end='\n\n')

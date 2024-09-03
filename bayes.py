@@ -1,8 +1,5 @@
 import time
 
-from matplotlib import pyplot as plt
-from seaborn import heatmap
-from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
 
 from utils.metrics import print_metrics, plot_roc_curves
@@ -11,17 +8,7 @@ from utils.vocabulary import get_most_frequent_words
 
 vocabulary_sizes = [100, 500, 1000, 2000, 3000]
 
-def plot_confusion_matrix(y_test, y_pred):
-    m = confusion_matrix(y_test, y_pred)
-    ax = heatmap(m, annot=True, cmap='Blues')
-    ax.set_title('Confusion matrix\n')
-    ax.set_xlabel('Predicted Values')
-    ax.set_ylabel('True Values')
-    ax.xaxis.set_ticklabels(['False', 'True'])
-    ax.yaxis.set_ticklabels(['False', 'True'])
-    plt.show()
-
-def test_sizes():
+def compare_sizes():
     ys_test = []
     ys_pred = []
     for size in vocabulary_sizes:
@@ -55,4 +42,4 @@ def train_bayes(x_train, y_train) -> MultinomialNB:
     return bayes.fit(x_train, y_train)
 
 if __name__ == '__main__':
-    test_sizes()
+    compare_sizes()

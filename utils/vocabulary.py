@@ -1,5 +1,5 @@
 """
-This module contains the functions used to build the vocabulary for the vectorization of the dataset files.
+This module contains functions for building the vocabulary used for the vectorization of the dataset files.
 """
 
 import os
