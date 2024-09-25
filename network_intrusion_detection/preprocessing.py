@@ -1,10 +1,14 @@
 import os
 
+import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import resample
 
 RANDOM_STATE = 43
 
+label_encoder = LabelEncoder()
 
 def get_simple_split(directory: str) -> (pd.DataFrame, pd.DataFrame):
     train = []
@@ -67,10 +71,13 @@ def undersample(dframe: pd.DataFrame, magnitude: float) -> pd.DataFrame:
 
 def preprocess(dframe: pd.DataFrame) -> pd.DataFrame:
     dframe.columns = dframe.columns.str.strip()
-    dframe["Label"] = dframe["Label"].map(change_label)  # Remap labels
+    dframe["Label"] = dframe["Label"].map(change_label) # Remap labels
 
-    dframe = dframe.loc[:, (dframe != 0).any(axis=0)]  # Remove columns with all zeroes
     dframe = undersample(dframe, 0.25)
+    dframe["Label"] = label_encoder.fit_transform(dframe["Label"])
+
+    dframe.replace([np.inf, -np.inf], np.nan, inplace=True) # Replace infinite values
+
     return dframe
 
 
@@ -85,12 +92,24 @@ def get_dataset(directory: str, splitmode: float = 0.6) -> (pd.DataFrame, pd.Dat
             and data from Thursday to Friday into the test set.
     :return: A tuple of the form (train, test).
     """
-    train, test = get_mode_split(directory, splitmode) if 0 < splitmode < 1 else get_simple_split(directory)
-    return preprocess(train), preprocess(test)
+    train, test = get_simple_split(directory)
+
+    train = preprocess(train)
+    test = preprocess(test)
+
+    if 0 < splitmode < 1:
+        combined = pd.concat([train, test], ignore_index=True)
+        combined = combined.loc[:, (combined != 0).any(axis=0)] # Remove columns with all zeroes
+        train, test = train_test_split(combined, train_size=splitmode,
+                                       random_state=RANDOM_STATE, stratify=combined["Label"])
+
+    return train, test
 
 
 def main():
-    train, test = get_dataset('MachineLearningCVE', -1.0)
+    train, test = get_dataset('MachineLearningCVE', 0.6)
+    print(train.info())
+    print(test.info())
     print(f'Train:\n{train["Label"].value_counts(normalize=True)}')
     print(f'Test:\n{test["Label"].value_counts(normalize=True)}')
 
