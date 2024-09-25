@@ -7,8 +7,8 @@ from network_intrusion_detection.preprocessing import get_dataset
 
 
 def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
-    y = train['Label']
     X = train.drop(['Label'], axis='columns')
+    y = train['Label']
 
     decision_tree = DecisionTreeClassifier(max_depth=10)
     decision_tree.fit(X, y)
@@ -19,7 +19,7 @@ def train_random_forest(train: DataFrame) -> RandomForestClassifier:
     X = train.drop(['Label'], axis='columns')
     y = train['Label']
 
-    random_forest = RandomForestClassifier(max_depth=10, n_jobs=3, max_features=10)
+    random_forest = RandomForestClassifier(max_depth=10, n_jobs=4, max_features=10)
     random_forest.fit(X, y)
     plot_feature_importance(random_forest.feature_importances_[:10], X.columns[:10])
     return random_forest

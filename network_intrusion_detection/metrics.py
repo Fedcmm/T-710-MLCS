@@ -29,4 +29,5 @@ def plot_feature_importance(importance, feature_names):
     plt.barh(range(len(indices)), importance[indices], color='b', align='center')
     plt.yticks(range(len(indices)), feature_names[indices])
     plt.xlabel("Relative Importance")
+    plt.tight_layout()
     plt.show()
