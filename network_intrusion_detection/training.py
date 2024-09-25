@@ -1,19 +1,9 @@
-import seaborn as sb
-from matplotlib import pyplot as plt
 from pandas import DataFrame
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, recall_score, f1_score
 
+from network_intrusion_detection.metrics import display_metrics, plot_feature_importance
 from network_intrusion_detection.preprocessing import get_dataset
-
-
-def plot_confusion_matrix(y_true, y_pred):
-    m = confusion_matrix(y_true, y_pred)
-    ax = sb.heatmap(m, annot=True, cmap='Blues')
-    ax.set_title('Confusion matrix')
-    ax.set_xlabel('Predicted Values')
-    ax.set_ylabel('True Values')
-    plt.show()
 
 
 def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
@@ -25,24 +15,30 @@ def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
     return decision_tree
 
 
-def test_model():
-    train, test = get_dataset('MachineLearningCVE', 0.6)
-    decision_tree = train_decision_tree(train)
+def train_random_forest(train: DataFrame) -> RandomForestClassifier:
+    X = train.drop(['Label'], axis='columns')
+    y = train['Label']
+
+    random_forest = RandomForestClassifier(max_depth=10, n_jobs=3, max_features=10)
+    random_forest.fit(X, y)
+    plot_feature_importance(random_forest.feature_importances_[:10], X.columns[:10])
+    return random_forest
+
+
+def test_model(training_function, splitmode):
+    train, test = get_dataset('MachineLearningCVE', splitmode)
+    model = training_function(train)
 
     X_test = test.drop(['Label'], axis='columns')
     y_true = test['Label']
-    y_pred = decision_tree.predict(X_test)
+    y_pred = model.predict(X_test)
 
-    #print(decision_tree.score(X_test, y_true))
-    print(classification_report(y_true, y_pred))
-    print(f'Accuracy: {accuracy_score(y_true, y_pred)}')
-    print(f'Recall: {recall_score(y_true, y_pred)}')
-    print(f'F1-Score: {f1_score(y_true, y_pred)}')
-    plot_confusion_matrix(y_true, y_pred)
+    display_metrics(y_true, y_pred)
 
 
 def main():
-    test_model()
+    #test_model(train_decision_tree, 0.6)
+    test_model(train_random_forest, 0.6)
 
 
 if __name__ == '__main__':

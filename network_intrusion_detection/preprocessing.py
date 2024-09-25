@@ -10,6 +10,7 @@ RANDOM_STATE = 43
 
 label_encoder = LabelEncoder()
 
+
 def get_simple_split(directory: str) -> (pd.DataFrame, pd.DataFrame):
     train = []
     test = []
