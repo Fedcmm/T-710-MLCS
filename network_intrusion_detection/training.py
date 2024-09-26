@@ -1,9 +1,16 @@
+import os.path
+import sys
+from typing import Literal
+
 from pandas import DataFrame
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
 from sklearn.tree import DecisionTreeClassifier
 
-from network_intrusion_detection.metrics import display_metrics, plot_feature_importance
-from network_intrusion_detection.preprocessing import get_dataset
+import metrics
+import preprocessing
+
+plots_dir = os.path.join(os.path.dirname(__file__), 'plots')
 
 
 def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
@@ -15,31 +22,46 @@ def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
     return decision_tree
 
 
-def train_random_forest(train: DataFrame) -> RandomForestClassifier:
+def train_random_forest(train: DataFrame, split_type: str) -> RandomForestClassifier:
     X = train.drop(['Label'], axis='columns')
     y = train['Label']
 
     random_forest = RandomForestClassifier(max_depth=10, n_jobs=4, max_features=10)
     random_forest.fit(X, y)
-    plot_feature_importance(random_forest.feature_importances_[:10], X.columns[:10])
+
+    outfile = os.path.join(plots_dir, f'random_forest-{split_type}-features.png')
+    metrics.plot_feature_importance(random_forest.feature_importances_[:10], X.columns[:10], outfile)
     return random_forest
 
 
-def test_model(training_function, splitmode):
-    train, test = get_dataset('MachineLearningCVE', splitmode)
-    model = training_function(train)
+def test_model(which: Literal['decision_tree', 'random_forest'], splitmode: float):
+    train, test = preprocessing.get_dataset('MachineLearningCVE', splitmode)
+    split_type = '60_40' if 0 < splitmode < 1 else 'days'
+    model = train_decision_tree(train) if which == 'decision_tree' else train_random_forest(train, split_type)
 
     X_test = test.drop(['Label'], axis='columns')
     y_true = test['Label']
     y_pred = model.predict(X_test)
 
-    display_metrics(y_true, y_pred)
+    print(classification_report(y_true, y_pred, digits=4))
+    outfile = os.path.join(plots_dir, f'{which}-{split_type}-conf_matrix.png')
+    metrics.plot_confusion_matrix(y_true, y_pred, outfile)
 
 
-def main():
-    #test_model(train_decision_tree, 0.6)
-    test_model(train_random_forest, 0.6)
+def main(which: Literal['tree', 'forest', 'all'] = 'all'):
+    if which == 'tree' or which == 'all':
+        print('Training Decision Tree with 60:40 split')
+        test_model('decision_tree', 0.6)
+        print('Training Decision Tree with day split')
+        test_model('decision_tree', -1)
+    if which == 'forest' or which == 'all':
+        print('Training Random Forest with 60:40 split')
+        test_model('random_forest', 0.6)
+        print('Training Random Forest with day split')
+        test_model('random_forest', -1)
 
 
 if __name__ == '__main__':
-    main()
+    if not os.path.isdir(plots_dir):
+        os.mkdir(plots_dir)
+    main('all' if len(sys.argv) < 2 else sys.argv[1])
