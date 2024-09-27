@@ -13,12 +13,16 @@ import preprocessing
 plots_dir = os.path.join(os.path.dirname(__file__), 'plots')
 
 
-def train_decision_tree(train: DataFrame) -> DecisionTreeClassifier:
+def train_decision_tree(train: DataFrame, split_type: str) -> DecisionTreeClassifier:
     X = train.drop(['Label'], axis='columns')
     y = train['Label']
 
     decision_tree = DecisionTreeClassifier(max_depth=10)
     decision_tree.fit(X, y)
+
+    outfile = os.path.join(plots_dir, f'decision_tree-{split_type}-features.png')
+    metrics.plot_decision_tree(decision_tree, X.columns, preprocessing.label_encoder.inverse_transform(y.unique()), outfile)
+
     return decision_tree
 
 
@@ -37,7 +41,7 @@ def train_random_forest(train: DataFrame, split_type: str) -> RandomForestClassi
 def test_model(which: Literal['decision_tree', 'random_forest'], splitmode: float):
     train, test = preprocessing.get_dataset('MachineLearningCVE', splitmode)
     split_type = '60_40' if 0 < splitmode < 1 else 'days'
-    model = train_decision_tree(train) if which == 'decision_tree' else train_random_forest(train, split_type)
+    model = train_decision_tree(train, split_type) if which == 'decision_tree' else train_random_forest(train, split_type)
 
     X_test = test.drop(['Label'], axis='columns')
     y_true = test['Label']
@@ -50,14 +54,14 @@ def test_model(which: Literal['decision_tree', 'random_forest'], splitmode: floa
 
 def main(which: Literal['tree', 'forest', 'all'] = 'all'):
     if which == 'tree' or which == 'all':
-        print('Training Decision Tree with 60:40 split')
+        print('\nTraining Decision Tree with 60:40 split...')
         test_model('decision_tree', 0.6)
-        print('Training Decision Tree with day split')
+        print('\nTraining Decision Tree with day split...')
         test_model('decision_tree', -1)
     if which == 'forest' or which == 'all':
-        print('Training Random Forest with 60:40 split')
+        print('\nTraining Random Forest with 60:40 split...')
         test_model('random_forest', 0.6)
-        print('Training Random Forest with day split')
+        print('\nTraining Random Forest with day split...')
         test_model('random_forest', -1)
 
 
