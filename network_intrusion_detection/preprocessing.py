@@ -49,10 +49,32 @@ def undersample(dframe: pd.DataFrame, magnitude: float) -> pd.DataFrame:
     others = dframe[y != "Benign"]
 
     benign_undersampled = resample(benign, replace=False,
-                    n_samples=int(len(benign) * magnitude),
-                    random_state=RANDOM_STATE)
+                                   n_samples=int(len(benign) * magnitude),
+                                   random_state=RANDOM_STATE)
 
     return pd.concat([benign_undersampled, others])
+
+
+def upsample(dframe: pd.DataFrame, magnitude: float) -> pd.DataFrame:
+    """
+    Performs upsampling of "Exploit" entries in the given DataFrame.
+
+    :param dframe: The DataFrame to perform upsampling on.
+    :param magnitude: How many times to upsample the data, may be greater than 1.
+    :return: A new DataFrame containing the upsampled entries.
+    """
+    y = dframe["Label"]
+    exploit = dframe[y == "Exploit"]
+    others = dframe[y != "Exploit"]
+
+    if len(exploit) < 0:
+        return dframe
+
+    exploit_upsampled = resample(exploit, replace=True,
+                                 n_samples=int(len(exploit) * magnitude),
+                                 random_state=RANDOM_STATE)
+
+    return pd.concat([exploit_upsampled, others])
 
 
 def preprocess(dframe: pd.DataFrame) -> pd.DataFrame:
@@ -60,9 +82,12 @@ def preprocess(dframe: pd.DataFrame) -> pd.DataFrame:
     dframe["Label"] = dframe["Label"].map(change_label) # Remap labels
 
     dframe = undersample(dframe, 0.25)
+    dframe = upsample(dframe, 10)
     dframe["Label"] = label_encoder.fit_transform(dframe["Label"])
 
-    dframe.replace([np.inf, -np.inf], np.nan, inplace=True) # Replace infinite values
+    # Remove infinite values
+    dframe.replace([np.inf, -np.inf], np.nan, inplace=True)
+    dframe.dropna(inplace=True)
 
     return dframe
 
@@ -85,7 +110,6 @@ def get_dataset(directory: str, splitmode: float = 0.6) -> (pd.DataFrame, pd.Dat
 
     if 0 < splitmode < 1:
         combined = pd.concat([train, test], ignore_index=True)
-        combined = combined.loc[:, (combined != 0).any(axis=0)] # Remove columns with all zeroes
         train, test = train_test_split(combined, train_size=splitmode,
                                        random_state=RANDOM_STATE, stratify=combined["Label"])
 
@@ -94,10 +118,10 @@ def get_dataset(directory: str, splitmode: float = 0.6) -> (pd.DataFrame, pd.Dat
 
 def main():
     train, test = get_dataset('MachineLearningCVE', 0.6)
-    print(train.info())
-    print(test.info())
     print(f'Train:\n{train["Label"].value_counts(normalize=True)}')
+    print(train.info())
     print(f'Test:\n{test["Label"].value_counts(normalize=True)}')
+    print(test.info())
 
 
 if __name__ == '__main__':

@@ -17,11 +17,14 @@ def train_decision_tree(train: DataFrame, split_type: str) -> DecisionTreeClassi
     X = train.drop(['Label'], axis='columns')
     y = train['Label']
 
-    decision_tree = DecisionTreeClassifier(max_depth=10)
+    decision_tree = DecisionTreeClassifier(max_depth=10, random_state=preprocessing.RANDOM_STATE)
     decision_tree.fit(X, y)
 
     outfile = os.path.join(plots_dir, f'decision_tree-{split_type}-features.png')
-    metrics.plot_decision_tree(decision_tree, X.columns, preprocessing.label_encoder.inverse_transform(y.unique()), outfile)
+    features_mask = decision_tree.feature_importances_ > 0.04
+    metrics.plot_feature_importance(decision_tree.feature_importances_[features_mask],
+                                    X.columns[features_mask],
+                                    "Decision Tree", outfile)
 
     return decision_tree
 
@@ -30,11 +33,16 @@ def train_random_forest(train: DataFrame, split_type: str) -> RandomForestClassi
     X = train.drop(['Label'], axis='columns')
     y = train['Label']
 
-    random_forest = RandomForestClassifier(max_depth=10, n_jobs=4, max_features=10)
+    random_forest = RandomForestClassifier(max_depth=10, n_jobs=4, max_features=10,
+                                           random_state=preprocessing.RANDOM_STATE)
     random_forest.fit(X, y)
 
     outfile = os.path.join(plots_dir, f'random_forest-{split_type}-features.png')
-    metrics.plot_feature_importance(random_forest.feature_importances_[:10], X.columns[:10], outfile)
+    features_mask = random_forest.feature_importances_ > 0.04
+    metrics.plot_feature_importance(random_forest.feature_importances_[features_mask],
+                                    X.columns[features_mask],
+                                    "Random Forest", outfile)
+
     return random_forest
 
 
@@ -47,9 +55,15 @@ def test_model(which: Literal['decision_tree', 'random_forest'], splitmode: floa
     y_true = test['Label']
     y_pred = model.predict(X_test)
 
-    print(classification_report(y_true, y_pred, digits=4))
+    print(classification_report(preprocessing.label_encoder.inverse_transform(y_true),
+                                preprocessing.label_encoder.inverse_transform(y_pred),
+                                labels=preprocessing.label_encoder.classes_, digits=4))
     outfile = os.path.join(plots_dir, f'{which}-{split_type}-conf_matrix.png')
-    metrics.plot_confusion_matrix(y_true, y_pred, outfile)
+    metrics.plot_confusion_matrix(preprocessing.label_encoder.inverse_transform(y_true),
+                                  preprocessing.label_encoder.inverse_transform(y_pred),
+                                  preprocessing.label_encoder.classes_,
+                                  "Decision Tree" if which == 'decision_tree' else "Random Forest",
+                                  outfile)
 
 
 def main(which: Literal['tree', 'forest', 'all'] = 'all'):
