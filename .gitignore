@@ -365,5 +365,3 @@ pyrightconfig.json
 
 spam_detection/test-mails
 spam_detection/train-mails
-
-.idea
