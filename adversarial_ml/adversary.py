@@ -47,14 +47,23 @@ def plot_all_samples(advs, name):
     plt.show()
 
 
-def perform_attack(fb_model, attack, target_label):
+def get_fb_model():
+    model = load_model('mnist_cnn.keras')
+    print("Loaded model")
+    return fb.TensorFlowModel(model, (0.0, 1.0))
+
+
+def get_input_images():
     x_train, y_train_enc, _, _ = preprocessing.get_dataset()
     y_train = np.argmax(y_train_enc, axis=1)
 
     _, unique_idx = np.unique(y_train, return_index=True)
     x_train_tf = tf.convert_to_tensor(x_train[unique_idx], dtype=tf.float32)
     # y_train_tf = tf.convert_to_tensor(y_train[unique_idx])
+    return x_train_tf
 
+
+def perform_attack(fb_model, attack, x_train_tf, target_label):
     target = np.full((10,), target_label)
     criterion = fb.criteria.TargetedMisclassification(tf.convert_to_tensor(target))
     epsilons = [0.004, 0.01, 0.1, 1.0, 10.0, 30, 100]
@@ -89,9 +98,8 @@ def perform_attack(fb_model, attack, target_label):
 
 
 def main():
-    model = load_model('mnist_cnn.keras')
-    print("Loaded model")
-    fb_model = fb.TensorFlowModel(model, (0.0, 1.0))
+    fb_model = get_fb_model()
+    x_train_tf = get_input_images()
 
     attacks = {
         "L0FMNAttack": L0FMNAttack(),
@@ -104,7 +112,7 @@ def main():
         results = []
         for i in range(10):
             print(f"\nAttack with target class {i}")
-            results.append(perform_attack(fb_model, attack, i))
+            results.append(perform_attack(fb_model, attack, x_train_tf, i))
         plot_all_samples(results, name)
 
 
