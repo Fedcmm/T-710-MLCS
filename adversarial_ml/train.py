@@ -43,11 +43,11 @@ def train():
     model = create_model()
     model.summary()
 
-    history = model.fit(x_train, y_train_enc,
-                        epochs=EPOCHS,
-                        batch_size=BATCH_SIZE,
-                        verbose=VERBOSE,
-                        validation_split=0.3)
+    model.fit(x_train, y_train_enc,
+              epochs=EPOCHS,
+              batch_size=BATCH_SIZE,
+              verbose=VERBOSE,
+              validation_split=0.3)
 
     model.save("mnist_cnn.keras")
 
