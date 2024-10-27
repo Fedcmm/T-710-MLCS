@@ -16,7 +16,6 @@ plots_dir = os.path.join(os.path.dirname(__file__), 'plots')
 def plot_all_samples(advs, name):
     num_classes = 10
 
-    # Initialize a grid to hold images for each (true_label, predicted_label) pair
     grid = [[None for _ in range(num_classes)] for _ in range(num_classes)]
     for i in range(10):
         for j in range(10):
@@ -38,9 +37,9 @@ def plot_all_samples(advs, name):
         ax.get_xaxis().set_ticks([])
         ax.get_yaxis().set_ticks([])
 
+    fig.text(0.5, 0.97, f'Attack with {name}', size='xx-large', ha='center', va='center')
     fig.text(0.08, 0.5, 'Output classification', size='x-large', ha='center', va='center', rotation='vertical')
     fig.text(0.5, 0.92, 'Input class', size='x-large', ha='center', va='center')
-    fig.text(0.5, 0.97, f'Attack with {name}', size='xx-large', ha='center', va='center')
 
     plt.subplots_adjust(wspace=0.1, hspace=0.1)
     plt.savefig(os.path.join(plots_dir, f'{name}.png'))
